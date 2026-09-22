@@ -6,6 +6,38 @@ Playwright + TypeScript automation for the DemoBlaze e-commerce flow, including 
 
 This repository contains a Playwright Test suite for the DemoBlaze store with a maintainable Page Object Model, reusable API helpers, environment configuration, and test reporting.
 
+## What was implemented
+
+The automation focuses on the highest-value customer journeys for the DemoBlaze product store instead of attempting to cover every UI interaction. The suite includes 20 automated tests across UI and API layers.
+
+### UI coverage
+
+- **Core shopping flow:** load the home page, browse Phones, Laptops, and Monitors, open product details, add products to the cart, remove products, and verify cart contents.
+- **Cart and checkout:** add multiple products, retain cart state across navigation and refresh, submit a valid order, verify the purchase confirmation, and confirm the cart is empty after purchase.
+- **Negative scenarios:** verify checkout rejects missing customer details, a missing customer name, and a missing credit card.
+- **Edge cases:** handle an empty-cart order attempt, preserve the remaining item after removing one of two products, and preserve duplicate entries when the same product is added twice.
+- **Navigation and presentation:** verify the store title, product categories, product details, and navigation between Home, category views, and Cart.
+
+### API coverage
+
+The API tests cover the order lifecycle using reusable request helpers:
+
+- Authenticate with valid credentials and reject invalid credentials.
+- Retrieve available products with an authenticated token.
+- Create an order, retrieve it, validate its contents, and delete it during cleanup.
+- Verify the unsupported update operation returns `404` and does not change the order.
+- Reject order creation without authentication.
+- Verify a deleted order can no longer be retrieved.
+
+### Implementation approach
+
+- **Page Objects:** `HomePage`, `ProductPage`, and `CartPage` encapsulate locators and reusable actions for the main user journeys.
+- **API abstraction:** `ecommerceApi.ts` centralizes login, product, create, retrieve, update, and delete requests so tests describe behavior rather than request details.
+- **Shared data:** `testData.ts` keeps product names, categories, customer details, credentials, and API values in one place.
+- **Reliable synchronization:** tests use Playwright locator assertions, URL assertions, dialog event handling, and visibility checks instead of hard-coded sleeps.
+- **Data cleanup:** API order deletion runs in a `finally` block so test data is removed even when an intermediate assertion fails.
+- **Configuration and diagnostics:** the project uses environment-driven base URLs and credentials, Chromium execution, one retry, HTML reporting, a console reporter, and traces on retries.
+
 ## Prerequisites
 
 - Node.js 18 or newer
